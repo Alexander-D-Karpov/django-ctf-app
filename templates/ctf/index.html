@@ -1,0 +1,77 @@
+{% extends "ctf/base_ctf.html" %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="row m-3">
+
+        {% if massage %}
+            {% if massage == "you are right!" %}
+            <div class="position-relative alert alert-success alert-dismissible fade show" role="alert">
+                {{ massage }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% else %}
+            <div class="position-relative alert alert-warning alert-dismissible fade show" role="alert">
+                {{ massage }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+        {% endif %}
+            {% for task in tasks %}
+                <div class="position-relative card m-3{% if task.name in solved %} bg-success text-white{% endif %}"
+                     style="max-width: 540px;">
+                    <div class="row g-0">
+                        <div class="col-md-12">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ task.name }}</h5>
+                                <p class="p-1 rounded text-white"><a class="link-warning"
+                                                                     href="/user/profile/{{ task.made_by.username }}">made
+                                    by: {{ task.made_by.username }}</a></p>
+                                <p class="card-text">{{ task.description|truncatewords:50 }}</p>
+                                <div class="row">
+                                    <div class="col">
+                                        {% if task.link %}
+                                            <a class="btn btn-primary" href="{{ task.link }}">solve </a>
+                                        {% endif %}
+                                        <a class="btn btn-secondary" href="{% url "task" task.name %}">see full
+                                            task </a>
+                                    </div>
+                                    <div class="col col-lg-2">
+                                        <p class="card-text "><small class="text-muted"></small><i
+                                                class="bi bi-flag-fill"></i> {{ task.solves }} solves</p>
+                                    </div>
+                                </div>
+                                {% if task.get_files %}
+                                        <h3>Files:</h3>
+                                    {% for file in task.get_files %}
+                                        <a href="{{ file.file.url }}" class="btn btn-success" download>{{ file.name }}</a>
+                                    {% endfor %}
+                                {% endif %}
+                                <hr>
+                                <div>
+                                    <form action="{% url "index.ctf" %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">flag{</span>
+                                            <input type="text" placeholder="sample_flag" name="flag"
+                                                   class="form-control" aria-label="flag">
+                                            <span class="input-group-text">}</span>
+                                            <input name="name" type="hidden" value="{{ task.name }}">
+                                            <button type="submit" class="btn btn-secondary ml-3">Check</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <br>
+        <div class="alert alert-warning" role="alert">
+            It seems, that you are not authenticated, <a href="{% url "login" %}">log in</a> or <a
+                href="{% url "register" %}">register</a> first
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "ctf/base_ctf.html" %}
+
+{% block content %}
+    <ul class="list-group list-group-flush">
+        <h1>{{ task.name }}</h1>
+        <p>{{ task.description }}</p>
+        {% for user in users %}
+            <li class="list-group-item"><a href="/user/profile/{{ user.user.username }}">{{ user.user.username }}</a>
+                solved {{ user.time | timesince }} ago
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
